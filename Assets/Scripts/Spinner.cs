@@ -46,17 +46,20 @@ public class Spinner : MonoBehaviour
     {
         const float Distance = 9F;
         const float Duration = 1F;
-        image.rectTransform
-            .DOLocalMoveY(-image.rectTransform.rect.size.y * Distance, Duration)
+        image.rectTransform.localPosition.y
+            .IncrementallyTweenCopyTo(-image.rectTransform.rect.size.y * Distance, Duration)
             .SetRelative()
-            .OnUpdate(() =>
+            .OnUpdate(state =>
             {
-                if (image.rectTransform.localPosition.y < canvas.rectTransform.rect.yMin)
+                Vector3 localPosition = image.rectTransform.localPosition;
+                float anchoringAdjustment = -image.rectTransform.rect.size.y / 2;
+                if (localPosition.y < canvas.rectTransform.rect.yMin + anchoringAdjustment)
                 {
-                    Vector3 localPosition = image.rectTransform.localPosition;
-                    localPosition.y += canvas.rectTransform.rect.size.y;
-                    image.rectTransform.localPosition = localPosition;
+                    localPosition.y += canvas.rectTransform.rect.size.y + image.rectTransform.rect.size.y;
                 }
+
+                localPosition.y += state.Delta;
+                image.rectTransform.localPosition = localPosition;
             })
             .OnComplete(() =>
             {
